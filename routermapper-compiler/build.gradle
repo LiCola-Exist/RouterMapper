@@ -23,3 +23,5 @@ allprojects {
         options.addStringOption('charSet', 'UTF-8')
     }
 }
+
+apply from : 'maven.gradle'
