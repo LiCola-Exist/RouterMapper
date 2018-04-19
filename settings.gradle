@@ -1,0 +1,1 @@
+include ':app', ':routermapper-annotation', ':routermapper-compiler'
