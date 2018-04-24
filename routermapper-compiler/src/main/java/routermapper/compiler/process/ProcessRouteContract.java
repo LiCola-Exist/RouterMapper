@@ -3,6 +3,7 @@ package routermapper.compiler.process;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import java.lang.annotation.Retention;
@@ -35,6 +36,9 @@ public class ProcessRouteContract {
     if (CheckUtils.isEmpty(elements)) {
       return null;
     }
+
+
+
     //定义接口型 契约类
     Builder classSpecBuild = TypeSpec.interfaceBuilder(className);
     //定义IntDef注释
@@ -57,14 +61,19 @@ public class ProcessRouteContract {
         .addMember("value", "$L", ClassName.get("java.lang.annotation.RetentionPolicy", "SOURCE"))
         .build();
 
-    //定义并构建 AnnotationContractName 注释
+    //定义并构建 AnnotationContractName 注解
     TypeSpec annotationIntent = TypeSpec.annotationBuilder(AnnotationContractName)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .addAnnotation(interfaceAnnotationIntDefBuilder.build())//添加IntDef
         .addAnnotation(interfaceAnnotationRetention)//添加Retention
+        .addJavadoc("作用于Source源文件的注释\n用于代码检查\n")
         .build();
 
     classSpecBuild.addModifiers(Modifier.PUBLIC).addType(annotationIntent);//添加注释字段
+
+
+    classSpecBuild.addJavadoc("路由的契约类\n约定Activity类与int数值间的直接对应关系\n");
+    classSpecBuild.addJavadoc("$S相当于占位符，用于未知Activity或还没有界面的跳转，并能通过编译检查",PLACEHOLDER_ACTIVITY);
 
     return classSpecBuild.build();
   }

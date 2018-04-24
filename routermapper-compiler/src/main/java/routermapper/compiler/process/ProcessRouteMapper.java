@@ -66,6 +66,7 @@ public class ProcessRouteMapper {
     //定义并构建 方法
     MethodSpec getClassMethod = MethodSpec.methodBuilder(MethodMapperName)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addAnnotation(ClassName.get("android.support.annotation", "Nullable"))
         .addParameter(targetParameter)
         .addStatement(" return $L.get(target) != null ? $L.get(target) : null", FieldMapperName,
             FieldMapperName)
@@ -87,6 +88,7 @@ public class ProcessRouteMapper {
         .addMethod(getClassMethod);//添加方法
 
     classSpecBuild.addStaticBlock(codeBlockBuilder.build());
+    classSpecBuild.addJavadoc("路由表\n通过int值获取Activity类\n");
 
     return classSpecBuild.build();
   }
