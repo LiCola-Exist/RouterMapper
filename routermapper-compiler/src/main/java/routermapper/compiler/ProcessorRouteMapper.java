@@ -1,4 +1,4 @@
-package routermapper.compiler.process;
+package routermapper.compiler;
 
 import com.google.auto.common.MoreElements;
 import com.squareup.javapoet.ClassName;
@@ -12,24 +12,24 @@ import java.util.HashMap;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import routermapper.compiler.CheckUtils;
+import routermapper.Route;
 
 /**
  * Created by LiCola on 2017/6/21.
  */
 
-public class ProcessRouteMapper {
+public class ProcessorRouteMapper {
 
   private static final String FieldMapperName = "router";//映射类字段名
   private static final String MethodMapperName = "mapperActivity";//映射类方法名
 
   public Set<? extends Element> elements;
 
-  public static ProcessRouteMapper build(Set<? extends Element> elements) {
-    return new ProcessRouteMapper(elements);
+  public static ProcessorRouteMapper build(Set<? extends Element> elements) {
+    return new ProcessorRouteMapper(elements);
   }
 
-  public ProcessRouteMapper(Set<? extends Element> elements) {
+  public ProcessorRouteMapper(Set<? extends Element> elements) {
     this.elements = elements;
   }
 
@@ -60,7 +60,7 @@ public class ProcessRouteMapper {
         .addModifiers(Modifier.FINAL)
         .addAnnotation(
             ClassName.get(packageName, dependClassName,
-                ProcessRouteContract.AnnotationContractName))//获取契约类的注释
+                ProcessorRouteContract.AnnotationContractName))//获取契约类的注释
         .build();
 
     //定义并构建 方法
@@ -88,7 +88,10 @@ public class ProcessRouteMapper {
         .addMethod(getClassMethod);//添加方法
 
     classSpecBuild.addStaticBlock(codeBlockBuilder.build());
-    classSpecBuild.addJavadoc("路由表\n通过int值获取Activity类\n");
+    classSpecBuild.addJavadoc("Created by $L on $L \n", Route.class.getSimpleName(),
+        Utils.getNowTime())
+        .addJavadoc("路由表\n")
+        .addJavadoc("功能:通过int值获取Activity类\n");
 
     return classSpecBuild.build();
   }

@@ -1,34 +1,33 @@
-package routermapper.compiler.process;
+package routermapper.compiler;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
 import java.lang.annotation.Retention;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import routermapper.compiler.CheckUtils;
+import routermapper.Route;
 
 /**
  * Created by LiCola on 2017/6/21.
  */
 
-public class ProcessRouteContract {
+public class ProcessorRouteContract {
 
   private static final String PLACEHOLDER_ACTIVITY = "UnknownAty";
 
-  static final String AnnotationContractName = "Name";//契约类注释名
+  static final String AnnotationContractName = "Target";//契约类注释名
 
   public Set<? extends Element> elements;
 
-  public static ProcessRouteContract build(Set<? extends Element> elements) {
-    return new ProcessRouteContract(elements);
+  public static ProcessorRouteContract build(Set<? extends Element> elements) {
+    return new ProcessorRouteContract(elements);
   }
 
-  private ProcessRouteContract(Set<? extends Element> elements) {
+  private ProcessorRouteContract(Set<? extends Element> elements) {
     this.elements = elements;
   }
 
@@ -36,8 +35,6 @@ public class ProcessRouteContract {
     if (CheckUtils.isEmpty(elements)) {
       return null;
     }
-
-
 
     //定义接口型 契约类
     Builder classSpecBuild = TypeSpec.interfaceBuilder(className);
@@ -71,9 +68,11 @@ public class ProcessRouteContract {
 
     classSpecBuild.addModifiers(Modifier.PUBLIC).addType(annotationIntent);//添加注释字段
 
-
-    classSpecBuild.addJavadoc("路由的契约类\n约定Activity类与int数值间的直接对应关系\n");
-    classSpecBuild.addJavadoc("$S相当于占位符，用于未知Activity或还没有界面的跳转，并能通过编译检查",PLACEHOLDER_ACTIVITY);
+    classSpecBuild.addJavadoc("Created by $L on $L \n", Route.class.getSimpleName(),
+        Utils.getNowTime())
+        .addJavadoc("路由的契约类\n")
+        .addJavadoc("功能：约定Activity类与int数值间的直接对应关系\n")
+        .addJavadoc("注：$S相当于占位符，用于未知Activity或还没有界面的跳转\n", PLACEHOLDER_ACTIVITY);
 
     return classSpecBuild.build();
   }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import com.licola.routermapper.router.RouteContract;
-import com.licola.routermapper.router.RouteContract.Name;
 import com.licola.routermapper.router.RouteMapper;
 
 /**
@@ -33,7 +32,7 @@ public abstract class BaseViewActivity extends AppCompatActivity {
    * @param target
    * @return
    */
-  public boolean onNavigation(@RouteContract.Name int target) {
+  public boolean onNavigation(@RouteContract.Target int target) {
     Class targetActivity = RouteMapper.mapperActivity(target);
     if (targetActivity == null) {
       //不存在界面 只有UnknownAty才能通过 编译时检查

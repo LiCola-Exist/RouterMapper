@@ -10,14 +10,8 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [RoutePackage: "com.licola.routermapper.router"]
-            }
-        }
     }
     buildTypes {
-
 
         release {
             minifyEnabled false
@@ -30,9 +24,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //项目注解
     implementation project(':routermapper-annotation')
-    //编译工具 annotationProcessor 替换 apt
+    //编译工具
     annotationProcessor project(':routermapper-compiler')
-
 
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
