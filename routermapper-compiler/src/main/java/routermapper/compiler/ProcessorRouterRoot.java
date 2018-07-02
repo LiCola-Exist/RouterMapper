@@ -1,6 +1,8 @@
 package routermapper.compiler;
 
 
+import static routermapper.compiler.Constants.KEY_MODULE_NAME;
+
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -16,6 +18,8 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
@@ -28,6 +32,7 @@ import routermapper.Route;
  *
  */
 @AutoService(Processor.class)
+@SupportedOptions(KEY_MODULE_NAME)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ProcessorRouterRoot extends AbstractProcessor {
 
@@ -37,13 +42,15 @@ public class ProcessorRouterRoot extends AbstractProcessor {
 
 
   private Filer filer;
-
+  private String moduleName;
   @Override
   public synchronized void init(ProcessingEnvironment processingEnvironment) {
     super.init(processingEnvironment);
-    filer = processingEnv.getFiler();
+    filer = processingEnvironment.getFiler();
+    moduleName=processingEnvironment.getOptions().get(KEY_MODULE_NAME);
+    moduleName=Utils.checkAndUpperFirstChar(moduleName);
+    Messager messager = processingEnvironment.getMessager();
   }
-
 
   @Override
   public Set<String> getSupportedAnnotationTypes() {
@@ -63,7 +70,6 @@ public class ProcessorRouterRoot extends AbstractProcessor {
   @Override
   public boolean process(Set<? extends TypeElement> annotations,
       RoundEnvironment roundEnvironment) {
-    Messager messager = processingEnv.getMessager();
 
     List<OutWriteCommand> commands = new ArrayList<>();
 
@@ -73,7 +79,7 @@ public class ProcessorRouterRoot extends AbstractProcessor {
 
         TypeSpec typeSpec = ProcessorRouteContract
             .build(roundEnvironment.getElementsAnnotatedWith(Route.class))
-            .process(DEFAULT_ROUTE_CONTRACT_NAME);
+            .process(DEFAULT_ROUTE_CONTRACT_NAME+moduleName);
 
         if (typeSpec == null) {
           return;
@@ -84,23 +90,23 @@ public class ProcessorRouterRoot extends AbstractProcessor {
       }
     });
 
-    commands.add(new OutWriteCommand() {
-      @Override
-      public void execute() throws IOException {
-
-        TypeSpec typeSpec = ProcessorRouteMapper
-            .build(roundEnvironment.getElementsAnnotatedWith(Route.class))
-            .process(DEFAULT_ROUTE_MAPPER_NAME, DEFAULT_ROUTE_CONTRACT_NAME,
-                PACKAGE_OF_GENERATE_FILE);
-
-        if (typeSpec == null) {
-          return;
-        }
-
-        JavaFile javaFile = JavaFile.builder(PACKAGE_OF_GENERATE_FILE, typeSpec).build();
-        javaFile.writeTo(filer);
-      }
-    });
+//    commands.add(new OutWriteCommand() {
+//      @Override
+//      public void execute() throws IOException {
+//
+//        TypeSpec typeSpec = ProcessorRouteMapper
+//            .build(roundEnvironment.getElementsAnnotatedWith(Route.class))
+//            .process(DEFAULT_ROUTE_MAPPER_NAME, DEFAULT_ROUTE_CONTRACT_NAME,
+//                moduleName);
+//
+//        if (typeSpec == null) {
+//          return;
+//        }
+//
+//        JavaFile javaFile = JavaFile.builder(moduleName, typeSpec).build();
+//        javaFile.writeTo(filer);
+//      }
+//    });
 
     try {
       //依次生成代码

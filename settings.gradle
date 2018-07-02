@@ -1,1 +1,1 @@
-include ':app', ':routermapper-annotation', ':routermapper-compiler'
+include ':app', ':routermapper-annotation', ':routermapper-compiler', ':routermapper-api', ':module'

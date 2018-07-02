@@ -9,7 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/module" />
             <option value="$PROJECT_DIR$/routermapper-annotation" />
+            <option value="$PROJECT_DIR$/routermapper-api" />
             <option value="$PROJECT_DIR$/routermapper-compiler" />
           </set>
         </option>

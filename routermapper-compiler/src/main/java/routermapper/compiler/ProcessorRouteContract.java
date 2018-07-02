@@ -17,8 +17,6 @@ import routermapper.Route;
 
 public class ProcessorRouteContract {
 
-  private static final String PLACEHOLDER_ACTIVITY = "UnknownAty";
-
   static final String AnnotationContractName = "Target";//契约类注释名
 
   public Set<? extends Element> elements;
@@ -43,9 +41,6 @@ public class ProcessorRouteContract {
         AnnotationSpec.builder(ClassName.get("android.support.annotation", "IntDef"));
 
     int index = 0;
-    //添加一个占位 用于在界面没有完成的请求下 代码能够编译
-    addFieldAndAnnotationField(classSpecBuild, interfaceAnnotationIntDefBuilder, index++,
-        PLACEHOLDER_ACTIVITY);
     for (Element element : elements) {
       String itemAty = element.getSimpleName().toString();
       addFieldAndAnnotationField(classSpecBuild, interfaceAnnotationIntDefBuilder, index,
@@ -71,8 +66,7 @@ public class ProcessorRouteContract {
     classSpecBuild.addJavadoc("Created by $L on $L \n", Route.class.getSimpleName(),
         Utils.getNowTime())
         .addJavadoc("路由的契约类\n")
-        .addJavadoc("功能：约定Activity类与int数值间的直接对应关系\n")
-        .addJavadoc("注：$S相当于占位符，用于未知Activity或还没有界面的跳转\n", PLACEHOLDER_ACTIVITY);
+        .addJavadoc("功能：约定Activity类与int数值间的直接对应关系\n");
 
     return classSpecBuild.build();
   }
