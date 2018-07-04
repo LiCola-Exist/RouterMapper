@@ -4,6 +4,7 @@ package routermapper.compiler;
 import static routermapper.compiler.Constants.KEY_MODULE_NAME;
 
 import com.google.auto.service.AutoService;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import java.io.IOException;
@@ -18,7 +19,6 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
@@ -29,7 +29,6 @@ import routermapper.Route;
  * Created by LiCola on 2017/6/21.
  *
  * 注解生成代码：生成目录在项目build包下，和目标类同级
- *
  */
 @AutoService(Processor.class)
 @SupportedOptions(KEY_MODULE_NAME)
@@ -43,12 +42,13 @@ public class ProcessorRouterRoot extends AbstractProcessor {
 
   private Filer filer;
   private String moduleName;
+
   @Override
   public synchronized void init(ProcessingEnvironment processingEnvironment) {
     super.init(processingEnvironment);
     filer = processingEnvironment.getFiler();
-    moduleName=processingEnvironment.getOptions().get(KEY_MODULE_NAME);
-    moduleName=Utils.checkAndUpperFirstChar(moduleName);
+    moduleName = processingEnvironment.getOptions().get(KEY_MODULE_NAME);
+    moduleName = Utils.checkAndUpperFirstChar(moduleName);
     Messager messager = processingEnvironment.getMessager();
   }
 
@@ -79,7 +79,7 @@ public class ProcessorRouterRoot extends AbstractProcessor {
 
         TypeSpec typeSpec = ProcessorRouteContract
             .build(roundEnvironment.getElementsAnnotatedWith(Route.class))
-            .process(DEFAULT_ROUTE_CONTRACT_NAME+moduleName);
+            .process(DEFAULT_ROUTE_CONTRACT_NAME + moduleName);
 
         if (typeSpec == null) {
           return;
@@ -90,23 +90,31 @@ public class ProcessorRouterRoot extends AbstractProcessor {
       }
     });
 
-//    commands.add(new OutWriteCommand() {
-//      @Override
-//      public void execute() throws IOException {
-//
-//        TypeSpec typeSpec = ProcessorRouteMapper
-//            .build(roundEnvironment.getElementsAnnotatedWith(Route.class))
-//            .process(DEFAULT_ROUTE_MAPPER_NAME, DEFAULT_ROUTE_CONTRACT_NAME,
-//                moduleName);
-//
-//        if (typeSpec == null) {
-//          return;
-//        }
-//
-//        JavaFile javaFile = JavaFile.builder(moduleName, typeSpec).build();
-//        javaFile.writeTo(filer);
-//      }
-//    });
+    commands.add(new OutWriteCommand() {
+      @Override
+      public void execute() throws IOException {
+
+        //得到定义的契约类
+        ClassName classNameContract =
+            ClassName.get(PACKAGE_OF_GENERATE_FILE, DEFAULT_ROUTE_CONTRACT_NAME + moduleName);
+
+        ClassName classNameContractAnnotation = ClassName
+            .get(PACKAGE_OF_GENERATE_FILE, DEFAULT_ROUTE_CONTRACT_NAME + moduleName,
+                ProcessorRouteContract.AnnotationContractName);//获取契约类的注释
+
+        TypeSpec typeSpec = ProcessorRouteMapper
+            .build(roundEnvironment.getElementsAnnotatedWith(Route.class))
+            .process(DEFAULT_ROUTE_MAPPER_NAME + moduleName, classNameContract,
+                classNameContractAnnotation);
+
+        if (typeSpec == null) {
+          return;
+        }
+
+        JavaFile javaFile = JavaFile.builder(PACKAGE_OF_GENERATE_FILE, typeSpec).build();
+        javaFile.writeTo(filer);
+      }
+    });
 
     try {
       //依次生成代码

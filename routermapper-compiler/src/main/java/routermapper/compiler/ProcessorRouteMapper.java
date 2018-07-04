@@ -33,17 +33,13 @@ public class ProcessorRouteMapper {
     this.elements = elements;
   }
 
-  public TypeSpec process(String className, String dependClassName, String packageName) {
+  public TypeSpec process(String className,  ClassName classNameContract,  ClassName classNameContractAnnotation) {
     if (CheckUtils.isEmpty(elements)) {
       return null;
     }
 
     //定义静态代码块
     CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
-    //得到定义的契约类
-    ClassName classNameContract =
-        ClassName.get(packageName, dependClassName);
-
     for (Element element : elements) {
       String itemAty = element.getSimpleName().toString();
 
@@ -58,9 +54,7 @@ public class ProcessorRouteMapper {
     //定义并构建 方法参数
     ParameterSpec targetParameter = ParameterSpec.builder(int.class, "target")
         .addModifiers(Modifier.FINAL)
-        .addAnnotation(
-            ClassName.get(packageName, dependClassName,
-                ProcessorRouteContract.AnnotationContractName))//获取契约类的注释
+        .addAnnotation(classNameContractAnnotation)//获取契约类的注释
         .build();
 
     //定义并构建 方法
